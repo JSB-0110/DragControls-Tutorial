@@ -1,13 +1,344 @@
-<html>
-	<head>
-		<meta charset="utf-8">
-		<title>DragControls by 201920707 JeongSebin </title>
-		<style>body { margin: 0; }</style>
-	</head>
-	<body>
-		<script src="js/three.js"></script>
-        <script src="DC.js"></script>
-		<canvas id="HelloCanvas"></canvas>
-		<script src="script.js"></script>	
-	</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>DragControl Tutorials by 201920707 JeongSebin</title>
+
+<style type="text/css" media="screen">
+
+    body {
+        line-height: 140%;
+        margin: 50px;
+        width: 800px;
+    }
+    code {font-size: 120%;}
+    
+    
+    pre code {
+        background-color: #eee;
+        border: 1px solid #999;
+        display: block;
+        padding: 20px;
+    }
+    
+</style>
+
+</head>
+
+<body>
+<h1 id="title">DragControl Tutorials</h1>
+<p>CC-BY-NC Jeong Sebin</p>
+<p>2022 Spring Semester</p>
+<p>Ajou University, Software department</p>
+
+<script src="js/three.js"></script>
+<script src="DC.js"></script>
+
+<h2 id="info">What is DragControls?</h2>
+<p>Three.js introduced many control classes that allows the user to interact with your screen outputs.</p>
+<p>DragControls is one of those controls which can be used for a drag'n'drop interaction with your objects.</p>
+
+
+<p>The main constructor is this.</p>
+<p>DragControls( objects : Array, camera : Camera, domElement : HTMLDOMElement )</p>
+
+<h2 id="Howto">How to use DragControls</h2>
+<h3 id="prepare">1. Prepair Object</h3>
+<p>First, we need an object to move on the screen.</p>
+<p>We will be using three Icosahedron in this example.</p>
+
+<pre><code>const h_scr = window.innerWidth;
+    const v_scr = window.innerHeight; 
+    
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color( 0x434343 );
+    const camera = new THREE.PerspectiveCamera(45, h_scr/v_scr, 0.1, 1000);
+    camera.position.z = 10;
+    
+    var renderer = new THREE.WebGLRenderer();
+    renderer.setSize( window.innerWidth, window.innerHeight );
+    document.body.appendChild( renderer.domElement );
+
+    const geometry = new THREE.IcosahedronGeometry();
+    const material1 = new THREE.MeshPhongMaterial( { color: 0xff0000, shininess : 90.0 });
+    const obj1 = new THREE.Mesh( geometry, material1 );
+    scene.add(obj1); 
+
+    const material2 = new THREE.MeshPhongMaterial( { color: 0x00ff00, shininess : 90.0 });
+    const obj2 = new THREE.Mesh( geometry, material2 );
+    obj2.position.x = -5;
+    scene.add(obj2); 
+
+    const material3 = new THREE.MeshPhongMaterial( { color: 0x0000ff, shininess : 90.0 });
+    const obj3 = new THREE.Mesh( geometry, material3 );
+    obj3.position.x = 5;
+    scene.add(obj3); 
+
+    objects.push(obj1);
+    objects.push(obj2);
+    objects.push(obj3);
+    
+    const light1 = new THREE.DirectionalLight(0xffffff, 0.5); 
+        light1.position.set (0,0,10); 
+        scene.add( light1 ); 
+    
+    function animate() {
+        requestAnimationFrame( animate );
+    
+        renderer.render(scene, camera);
+    };
+    
+    animate();</code></pre>
+
+<img src="./Pictures/exstep1.png" alt="Img" width="800">
+
+
+<h3 id="addArr">2. Add Object Array</h3>
+<p>To use DragControls, your objects has to be in an array.</p>
+<p>If your object is already in an array, you can go directly to number 3.</p>
+
+<p>If it isn't, make an array, and push your objects in the array.</p>
+<pre><code>var objects = [];</code></pre>
+
+<pre><code>objects.push(obj);</code></pre>
+
+
+<h3 id="getClass">3. Setup DragControls class</h3>
+<p>You need a DragControl class imported in order for the code to work.</p>
+<p>There are many methods in DragControls" </p>
+
+<details>
+    <summary>DragControls.js by tristangemus (Click to Open)</summary>
+    <p><pre><code>/*
+ * @author tristangemus / https://github.com/learnthreejs
+                        /three-js-boilerplate/blob
+                        /example-dragcontrols-finish/public
+                        /examples/draggable-objects-dragcontrols
+                        /assets/DragControls.js
+ * @author zz85 / https://github.com/zz85
+ * @author mrdoob / http://mrdoob.com
+ * Running this will allow you to drag three.js objects around the screen.
+ */
+
+THREE.DragControls = function ( _objects, _camera, _domElement ) {
+
+	if ( _objects instanceof THREE.Camera ) {
+		console.warn( 'THREE.DragControls: Constructor now expects
+         ( objects, camera, domElement )' );
+		var temp = _objects; _objects = _camera; _camera = temp;
+
+	}
+
+	var _plane = new THREE.Plane();
+	var _raycaster = new THREE.Raycaster();
+
+	var _mouse = new THREE.Vector2();
+	var _offset = new THREE.Vector3();
+	var _intersection = new THREE.Vector3();
+
+	var _selected = null, _hovered = null;
+
+	//
+
+	var scope = this;
+
+	function activate() {
+
+		_domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
+		_domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
+		_domElement.addEventListener( 'mouseup', onDocumentMouseCancel, false );
+		_domElement.addEventListener( 'mouseleave', onDocumentMouseCancel, false );
+
+	}
+
+	function deactivate() {
+
+		_domElement.removeEventListener( 'mousemove', onDocumentMouseMove, false );
+		_domElement.removeEventListener( 'mousedown', onDocumentMouseDown, false );
+		_domElement.removeEventListener( 'mouseup', onDocumentMouseCancel, false );
+		_domElement.removeEventListener( 'mouseleave', onDocumentMouseCancel, false );
+
+	}
+
+	function dispose() {
+
+		deactivate();
+
+	}
+
+    function getObjects() {
+
+        return _objects;
+
+    }
+
+    function getRaycaster() {
+
+        return _raycaster;
+
+    }
+
+	function onDocumentMouseMove( event ) {
+
+		event.preventDefault();
+
+		var rect = _domElement.getBoundingClientRect();
+
+		_mouse.x = ( ( event.clientX - rect.left ) / rect.width ) * 2 - 1;
+		_mouse.y = - ( ( event.clientY - rect.top ) / rect.height ) * 2 + 1;
+
+		_raycaster.setFromCamera( _mouse, _camera );
+
+		if ( _selected && scope.enabled ) {
+
+			if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
+
+				_selected.position.copy( _intersection.sub( _offset ) );
+
+			}
+
+			scope.dispatchEvent( { type: 'drag', object: _selected } );
+
+			return;
+
+		}
+
+		_raycaster.setFromCamera( _mouse, _camera );
+
+		var intersects = _raycaster.intersectObjects( _objects );
+
+		if ( intersects.length > 0 ) {
+
+			var object = intersects[ 0 ].object;
+
+			_plane.setFromNormalAndCoplanarPoint( _camera.getWorldDirection( 
+                _plane.normal ), object.position );
+
+			if ( _hovered !== object ) {
+
+				scope.dispatchEvent( { type: 'hoveron', object: object } );
+
+				_domElement.style.cursor = 'pointer';
+				_hovered = object;
+
+			}
+
+		} else {
+
+			if ( _hovered !== null ) {
+
+				scope.dispatchEvent( { type: 'hoveroff', object: _hovered } );
+
+				_domElement.style.cursor = 'auto';
+				_hovered = null;
+
+			}
+
+		}
+
+	}
+
+	function onDocumentMouseDown( event ) {
+
+		event.preventDefault();
+
+		_raycaster.setFromCamera( _mouse, _camera );
+
+		var intersects = _raycaster.intersectObjects( _objects );
+
+		if ( intersects.length > 0 ) {
+
+			_selected = intersects[ 0 ].object;
+
+			if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
+
+				_offset.copy( _intersection ).sub( _selected.position );
+
+			}
+
+			_domElement.style.cursor = 'move';
+
+			scope.dispatchEvent( { type: 'dragstart', object: _selected } );
+
+		}
+
+
+	}
+
+	function onDocumentMouseCancel( event ) {
+
+		event.preventDefault();
+
+		if ( _selected ) {
+
+			scope.dispatchEvent( { type: 'dragend', object: _selected } );
+
+			_selected = null;
+
+		}
+
+		_domElement.style.cursor = 'auto';
+
+	}
+
+	activate();
+
+	// API
+
+	this.enabled = true;
+
+	this.activate = activate;
+	this.deactivate = deactivate;
+	this.dispose = dispose;
+    this.getObjects = getObjects;
+    this.getRaycaster = getRaycaster;
+
+};
+
+THREE.DragControls.prototype = Object.create( THREE.EventDispatcher.prototype );
+THREE.DragControls.prototype.constructor = THREE.DragControls;</code></pre></p>
+ </details>
+
+ <p>In short, ".active" adds event listeners and ".deactive" removes the event listeners.</p>
+
+
+
+<h3 id="addDC">4. Add Controls</h3>
+<p>Now we add the controls below in the code.</p>
+
+<pre><code>var controls = new THREE.DragControls( objects, camera, renderer.domElement );
+    //coloring selected object
+    controls.addEventListener( 'dragstart', dragStartCallback );
+    controls.addEventListener( 'dragend', dragendCallback );
+    
+    var startColor;
+    function dragStartCallback(event) {
+        startColor = event.object.material.color.getHex();
+        event.object.material.color.setHex(0xf3f3f3 );
+    }
+    function dragendCallback(event) {
+        event.object.material.color.setHex(startColor);
+    }</code></pre>
+
+
+
+<h3 id="getClass">5. Finished!</h3>
+<p>Here is a video showing how it should be working.</p>
+<video controls autoplay>
+    <source src="./Pictures/exstepf.mp4" type="video/mp4">
+</video>
+
+
+<h2 id="ex2">Harder Example</h3>
+
+
+<pre><code></code></pre>
+
+<script src="script.js"></script>
+<canvas id="HelloCanvas2"></canvas>
+    
+</body>
 </html>
