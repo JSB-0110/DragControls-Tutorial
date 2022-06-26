@@ -1,74 +1,47 @@
-/*
- * @author tristangemus / https://github.com/learnthreejs/three-js-boilerplate/blob/example-dragcontrols-finish/public/examples/draggable-objects-dragcontrols/assets/DragControls.js
- * @author mrdoob / http://mrdoob.com
- * Running this will allow you to drag three.js objects around the screen.
- */
-
 const h_scr = window.innerWidth;
 const v_scr = window.innerHeight; 
 
-
 const scene = new THREE.Scene();
 scene.background = new THREE.Color( 0x434343 );
-const camera = new THREE.PerspectiveCamera( 70, h_scr/v_scr, 1, 10000 );
+const camera = new THREE.PerspectiveCamera(45, h_scr/v_scr, 0.1, 1000);
+camera.position.z = 10;
+
 var objects = [];
 
 var renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
 
-camera.position.x = 200;
-camera.position.z = 1000;
-
 var startColor;
 
-function init() {
-	scene.add( new THREE.AmbientLight( 0x0f0f0f ) );
+const geometry = new THREE.IcosahedronGeometry();
+const material1 = new THREE.MeshPhongMaterial( { color: 0xff0000, shininess : 90.0 });
+const obj1 = new THREE.Mesh( geometry, material1 );
+scene.add(obj1); 
 
-	var light = new THREE.SpotLight( 0xffffff, 1.5 );
-	light.position.set( 0, 500, 2000 );
+const material2 = new THREE.MeshPhongMaterial( { color: 0x00ff00, shininess : 90.0 });
+const obj2 = new THREE.Mesh( geometry, material2 );
+obj2.position.x = -5;
+scene.add(obj2); 
 
-	scene.add(light);
+const material3 = new THREE.MeshPhongMaterial( { color: 0x0000ff, shininess : 90.0 });
+const obj3 = new THREE.Mesh( geometry, material3 );
+obj3.position.x = 5;
+scene.add(obj3); 
 
-    //Geometries 
-	var cubeG = new THREE.BoxGeometry( 40, 40, 40 );
-	var boxhG = new THREE.BoxGeometry( 20, 80, 40 );
-	var boxwG = new THREE.BoxGeometry( 100, 20, 40 );
-    var cylinG = new THREE.CylinderGeometry( 20, 20, 80 );
-    var roofG = new THREE.CylinderGeometry( 20, 40, 40 );
-    var coneG = new THREE.ConeGeometry( 30, 80, 60 );
+objects.push(obj1);
+objects.push(obj2);
+objects.push(obj3);
 
-    //object, number of objects
-	objectmaker(cubeG, 10);
-    objectmaker(boxhG, 10);
-    objectmaker(boxwG, 10);
-    objectmaker(roofG, 5);
-    objectmaker(cylinG, 10);
-    objectmaker(coneG, 5);
+const light1 = new THREE.DirectionalLight(0xffffff, 0.5); 
+	light1.position.set (0,0,10); 
+	scene.add( light1 ); 
 
-	var controls = new THREE.DragControls( objects, camera, renderer.domElement );
-    //coloring selected object
-	controls.addEventListener( 'dragstart', dragStartCallback );
-	controls.addEventListener( 'dragend', dragendCallback );
-}
+var controls = new THREE.DragControls( objects, camera, renderer.domElement );
+//coloring selected object
+controls.addEventListener( 'dragstart', dragStartCallback );
+controls.addEventListener( 'dragend', dragendCallback );
 
-function objectmaker(geometry, numbers) {
-    for (var i = 0; i < numbers; i++) {
-        var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
-
-        object.position.x = Math.random() * 10 + 500;
-        object.position.y = Math.random() * 600 - 300;
-        object.position.z = 500;
-        //object.position.z = Math.random() * 800 - 400;
-
-        object.castShadow = true;
-        object.receiveShadow = true;
-
-        scene.add( object );
-
-        objects.push( object );
-    }
-}
 
 function dragStartCallback(event) {
 	startColor = event.object.material.color.getHex();
@@ -84,5 +57,4 @@ function animate() {
 	renderer.render(scene, camera);
 };
 
-init();
 animate();

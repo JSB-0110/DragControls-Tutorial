@@ -51,6 +51,18 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 	}
 
+    function getObjects() {
+
+        return _objects;
+
+    }
+
+    function getRaycaster() {
+
+        return _raycaster;
+
+    }
+
 	function onDocumentMouseMove( event ) {
 
 		event.preventDefault();
@@ -162,6 +174,8 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 	this.activate = activate;
 	this.deactivate = deactivate;
 	this.dispose = dispose;
+    this.getObjects = getObjects;
+    this.getRaycaster = getRaycaster;
 
 };
 
