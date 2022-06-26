@@ -55,8 +55,10 @@ There are two examples.
 
 - github: https://github.com/learnthreejs/three-js-boilerplate/blob/example-dragcontrols-finish/public/examples/draggable-objects-dragcontrols/assets/DragControls.js
 
-4. Using Code Examples in HTML
+4. three.js-main = 04_three_boxes.js from CG class.
+
+5. Using Code Examples in HTML
 - http://web.simmons.edu/~grabiner/comm244/weekfour/code-test.html
 
-5. Source code beautifier
+6. Source code beautifier
 - http://hilite.me/
