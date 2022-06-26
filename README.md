@@ -25,7 +25,7 @@ There are two examples.
 
 1. a step-by-step explaination using three Icosahedrons.
 
-        and
+   and
 
 2. a applicated example to summon moveable bricks to make a toy castle.
 
