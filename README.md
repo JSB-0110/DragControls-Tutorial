@@ -33,11 +33,11 @@ and
 ## Results
 1. Icosahedrons example
 
-![ex1](https://git.ajou.ac.kr/JSB/dragcontrols-tutorial/-/blob/main/Pictures/exstepf.mp4)
+![ex1](https://git.ajou.ac.kr/JSB/dragcontrols-tutorial/-/raw/main/Pictures/exstepf.mp4)
 
 2. Toy castle example
 
-![csmk](https://git.ajou.ac.kr/JSB/dragcontrols-tutorial/-/blob/main/Pictures/hardex.png)
+![csmk](https://git.ajou.ac.kr/JSB/dragcontrols-tutorial/-/raw/main/Pictures/hardex.png)
 
 ## Reference
 1. Official : three.js DragControls
