@@ -33,7 +33,7 @@ and
 ## Results
 1. Icosahedrons example
 
-![ex1](https://git.ajou.ac.kr/JSB/dragcontrols-tutorial/-/raw/main/Pictures/exstepf.mp4)
+![ex1](https://git.ajou.ac.kr/JSB/dragcontrols-tutorial/-/raw/main/Pictures/exstepf.gif)
 
 2. Toy castle example
 
