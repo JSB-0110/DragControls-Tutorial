@@ -37,7 +37,7 @@ and
 
 2. Toy castle example
 
-![csmk](https://git.ajou.ac.kr/JSB/dragcontrols-tutorial/-/blob/main/Pictures/hardex.PNG)
+![csmk](https://git.ajou.ac.kr/JSB/dragcontrols-tutorial/-/blob/main/Pictures/hardex.png)
 
 ## Reference
 1. Official : three.js DragControls
